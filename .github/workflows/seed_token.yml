@@ -1,0 +1,22 @@
+name: Seed Spotify Token
+
+on:
+  workflow_dispatch:   # manually trigger from GitHub UI
+
+jobs:
+  upload-token:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Copy your local token into the repo temporarily
+      # OR commit it to a branch that only this workflow uses
+      # Example: let's assume you commit it as token_cache.json in the repo temporarily
+
+      - name: Upload token artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotify-token
+          path: token_cache.json
