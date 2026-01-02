@@ -1,0 +1,57 @@
+name: Spotify Data Job
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # every 6 hours
+  workflow_dispatch:       # allow manual run
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️ Checkout repo
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2️ Cache pip packages
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # 3️ Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      # 4️ Install dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 5️ Download cached token artifact if it exists
+      - name: Download cached token
+        uses: actions/download-artifact@v4
+        with:
+          name: spotify-token
+        continue-on-error: true  # first run may not have artifact
+
+      # 6️ Run your main Python script
+      - name: Run Spotify script
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+        run: python main.py
+
+      # 7️ Upload updated token artifact for next run
+      - name: Upload token cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: spotify-token
+          path: user_token.json
