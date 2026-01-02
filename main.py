@@ -1,11 +1,16 @@
 import requests
 import json
 from auth_handler import SpotifyUserAuth
+from token_cache import load_cached_token, save_token
+
+# Fetch Cached Token If Exists
+cache = load_cached_token()
+print(type(cache))
 
 # Get Access Token from Spotify
 auth = SpotifyUserAuth()
-
-token = auth.get_auth_token()
+token, token_info = auth.get_auth_token(cache)
+save_token(token_info)
 
 print(f"Ready to work with token: {token[:3]}...{token[-3:]}")
 
@@ -32,23 +37,5 @@ for track in data["items"]:
     if i not in spotify_ids:
         spotify_ids.append(i)
 
-
+print(data)
 # Get Track Audio Features
-features_api_url = "https://api.spotify.com/v1/audio-features?ids="
-features_api_headers = {
-    "Authorization": f"Bearer {token}"
-}
-features_api_response = requests.get(
-    features_api_url,
-    headers = features_api_headers,
-    params = {"ids": ",".join(spotify_ids)}
-)
-
-if features_api_response.status_code != 200:
-            raise Exception(f"Authentication failed: {features_api_response.json()}")
-#api_response.raise_for_status()
-
-features_data = features_api_response.json()
-
-with open('features.json', "w") as f:
-            json.dump(features_data, f)

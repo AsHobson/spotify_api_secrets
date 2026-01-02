@@ -37,19 +37,16 @@ class SpotifyUserAuth:
         self.client_secret = os.getenv("CLIENT_SECRET")
         self.redirect_uri = "http://127.0.0.1:8888"
         self.scope = "user-read-recently-played"
-        self.token_file = "user_token.json"
         self.auth_url = "https://accounts.spotify.com/authorize"
         self.token_url = "https://accounts.spotify.com/api/token"
         self.state = secrets.token_urlsafe(32)
 
-    def get_auth_token(self):
-        if os.path.exists(self.token_file):
-            with open(self.token_file, "r") as f:
-                token_data = json.load(f)
-            
+    def get_auth_token(self, token_data):
+        if token_data is not None:
+
             if time.time() < token_data['expires_at']:
                 print('returning cached token')
-                return token_data['access_token']
+                return token_data['access_token'], token_data
             else:
                 print('need to refresh')
                 return self._refresh_access_token(token_data['refresh_token'])
@@ -135,13 +132,5 @@ class SpotifyUserAuth:
             "refresh_token": refresh_token,
             "expires_at": time.time() + data['expires_in'] - 60
         }
-
-        with open(self.token_file, "w") as f:
-            json.dump(token_info, f)
             
-        return token_info['access_token']
-
-if __name__ == "__main__":
-    spotify = SpotifyUserAuth()
-    token = spotify.get_auth_token()
-    print(f"Token successfully acquired: {token[:5]}...{token[-5:]}")
+        return token_info['access_token'], token_info
