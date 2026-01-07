@@ -47,7 +47,7 @@ jobs:
         env:
           CLIENT_KEY: ${{ secrets.CLIENT_KEY }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-        run: python main.py
+        run: python -u main.py
 
       # 7️ Upload updated token artifact for next run
       - name: Upload token cache
