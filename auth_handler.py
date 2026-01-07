@@ -130,7 +130,7 @@ class SpotifyUserAuth:
         token_info = {
             "access_token": data['access_token'],
             "refresh_token": refresh_token,
-            "expires_at": time.time() + data['expires_in'] - 60
+            "expires_at": data['expires_in'] - 60
         }
             
         return token_info['access_token'], token_info
