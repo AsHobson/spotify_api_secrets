@@ -20,6 +20,6 @@ def save_token(token_info):
     data = {
         "access_token": token_info['access_token'],
         "refresh_token": token_info['refresh_token'],
-        "expires_at": time.time() + token_info['expires_at']
+        "expires_at": token_info['expires_at'] - 60
     }
     token_file.write_text(json.dumps(data))
