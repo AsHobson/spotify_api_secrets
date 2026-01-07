@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-  - name: Create JSON config file
-    run: |
-      echo '${{ secrets.USER_TOKEN }}' > user_token.json
+
+      - name: Create JSON config file
+        run: |
+          echo '${{ secrets.USER_TOKEN }}' > user_token.json
     
       # 1️ Checkout repo
       - name: Checkout repo
