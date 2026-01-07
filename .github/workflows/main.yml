@@ -45,8 +45,8 @@ jobs:
       # 6️ Run your main Python script
       - name: Run Spotify script
         env:
-          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          CLIENT_KEY: ${{ secrets.CLIENT_KEY }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         run: python main.py
 
       # 7️ Upload updated token artifact for next run
