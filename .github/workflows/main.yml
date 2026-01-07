@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    
       # 1️ Checkout repo
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -35,21 +36,31 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 5️ Download cached token artifact if it exists
+      # 5. Try to download the most recent refreshed token
       - name: Download cached token
         uses: actions/download-artifact@v4
         with:
           name: spotify-token
-        continue-on-error: true  # first run may not have artifact
+        continue-on-error: true 
 
-      # 6️ Run your main Python script
+      # 6. Fallback: If the artifact doesn't exist, create it from the Secret
+      - name: Ensure user_token.json exists
+        run: |
+          if [ ! -f user_token.json ]; then
+            echo "Artifact not found or first run. Creating from Secret..."
+            echo '${{ secrets.USER_TOKEN }}' > user_token.json
+          else
+            echo "Successfully restored token from Artifact."
+          fi
+
+      # 7 Run your main Python script
       - name: Run Spotify script
         env:
-          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-        run: python main.py
+          CLIENT_KEY: ${{ secrets.CLIENT_KEY }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        run: python -u main.py
 
-      # 7️ Upload updated token artifact for next run
+      # 8 Upload updated token artifact for next run
       - name: Upload token cache
         uses: actions/upload-artifact@v4
         with:
